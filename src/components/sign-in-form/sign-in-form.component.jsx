@@ -1,26 +1,74 @@
 import { useState } from "react";
-import { auth, signInWithGooglePopup, createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
+import { auth, signInWithGooglePopup, signInEmailPassword, createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
 
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
+import './sign-in-form.styles.scss';
+
+const defaultFormFields = {
+    email: '',
+    password: '',
+};
+
+
 const SignInForm = () => {
+
+    const [formFields, setFormFields] = useState(defaultFormFields);
+    const {email, password} = formFields;
+    
+    const resetFormFields = () => {
+        setFormFields(defaultFormFields);
+    }
 
     const logGoogleUser = async () => {
         const { user } = await signInWithGooglePopup();
-        const userDocRef = await createUserDocumentFromAuth(user);
+    }
+
+    const logUser = async (event) => {
+        event.preventDefault();
+        try {
+            const {user} = await signInEmailPassword(email,password);
+            console.log(user);
+            resetFormFields();
+        } catch(error) {
+            switch (error.code) {
+                case 'auth/wrong-password':
+                    alert('You have entered a wrong password!');
+                    break;
+                case 'auth/user-not-found':
+                    alert('User account with this email address does not exist.');
+                    break;
+            
+                default:
+                    alert('An error occured.');
+                    break;
+            }
+    
+        }
+      
+    }
+
+    const handleChange = (event) => {
+        event.preventDefault();
+        const { name, value } = event.target;
+        setFormFields({...formFields, [name]: value});
     }
     
 
     return (
         <div className='sign-in-form-container'>
-        <h2>I already have an account</h2>
+        <h2>Already have an account?</h2>
         <span>Sign in with your email & password</span>
-        <form>
-        <FormInput type='email' name='email' onChange={changeHandler} />
-        <FormInput type='password' name='password' onChange={changeHandler} />
+        <form onSubmit={logUser}>
+        <FormInput label='Email' type='email' name='email' onChange={handleChange} value={email} required />
+        <FormInput label='Password' type='password' name='password' onChange={handleChange} value={password} required />
+        <div className="buttons-container">
+            <Button type='submit'>Sign in</Button>
+            <Button type='button' buttonType='google' onClick={logGoogleUser}>Sign in with Google</Button>
+        </div>
+
         </form>
-        <Button buttonType='google'>Log in with Google</Button>
         </div>
     );
 }
