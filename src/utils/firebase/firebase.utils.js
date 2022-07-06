@@ -1,6 +1,13 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, 
+  signInWithRedirect, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  onAuthStateChanged } from 'firebase/auth';
 import {
  getFirestore,
  doc,
@@ -37,11 +44,7 @@ export const db = getFirestore();
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
   if (!userAuth) return;
   const userDocRef = doc(db, 'users', userAuth.uid );
-  console.log(userDocRef);
-
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
 
   if(!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
@@ -66,10 +69,7 @@ export const createUserDocumentFromAuth = async (userAuth, additionalInformation
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if( !email || !password ) return;
-
   return await createUserWithEmailAndPassword(auth, email, password);
-
-
 }
 
 export const signInEmailPassword = async (email,password) => {
@@ -78,3 +78,8 @@ export const signInEmailPassword = async (email,password) => {
 }
 
 export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener =  (callback) => {
+  
+  onAuthStateChanged(auth, callback);
+} 
