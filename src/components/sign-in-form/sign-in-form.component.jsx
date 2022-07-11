@@ -4,10 +4,7 @@ import { signInWithGooglePopup, signInEmailPassword, createUserDocumentFromAuth 
 import FormInput from "../form-input/form-input.component";
 import Button, {BUTTON_TYPE_CLASSES} from "../button/button.component";
 
-import './sign-in-form.styles.scss';
-
-
-
+import {SignInFormContainer, ButtonsContainer} from './sign-in-form.styles';
 
 const defaultFormFields = {
     email: '',
@@ -60,19 +57,19 @@ const SignInForm = () => {
     
 
     return (
-        <div className='sign-in-form-container'>
+        <SignInFormContainer>
         <h2>Already have an account?</h2>
         <span>Sign in with your email & password</span>
         <form onSubmit={logUser}>
         <FormInput label='Email' type='email' name='email' onChange={handleChange} value={email} required />
         <FormInput label='Password' type='password' name='password' onChange={handleChange} value={password} required />
-        <div className="buttons-container">
+        <ButtonsContainer>
             <Button type='submit'>Sign in</Button>
             <Button type='button' buttonType={BUTTON_TYPE_CLASSES.google} onClick={logGoogleUser}>Sign in with Google</Button>
-        </div>
+        </ButtonsContainer>
 
         </form>
-        </div>
+        </SignInFormContainer>
     );
 }
 
