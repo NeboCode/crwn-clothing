@@ -17,13 +17,13 @@ import { signOutUser } from '../../utils/firebase/firebase.utils';
 import { selectCurrentUser } from '../../store/user/user.selector';
 import { useSelector } from 'react-redux';
 
+
 const Navigation = () => { 
 
   const currentUser = useSelector(selectCurrentUser);
-  // const { currentUser } = useContext(UserContext);
   const { isCartOpen } = useContext(CartContext);
 
-
+ 
     return(
       <Fragment>
         <NavigationContainer>

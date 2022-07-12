@@ -12,11 +12,6 @@ export const userReducer = (state = INITIAL_STATE, action) => {
                 ...state,
                 currentUser: payload
             }
-        case 'increment':
-            return {
-                value: state.value + 1,
-            }
-    
         default:
             return state;
     }
