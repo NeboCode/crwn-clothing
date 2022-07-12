@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useReducer } from "react";
+import { createAction } from "../utils/reducer/reducer.utils";
 
 const addCartItem = (cartItems, productToAdd) => {
 
@@ -36,6 +37,43 @@ const clearCartItem = (cartItems, cartItemToRemove) => {
     return cartItems.filter(cartItem => cartItem.id != cartItemToRemove.id);
 }
 
+const CART_ACTION_TYPES = {
+    SET_CART_ITEMS: 'SET_CART_ITEMS',
+    SET_IS_CART_OPEN: 'SET_IS_CART_OPEN'
+}
+
+const INITIAL_STATE = {
+    cartItems: [],
+    cartTotal: 0,
+    cartCount: 0,
+    isCartOpen: false
+};
+
+const cartReducer = (state, action) => {
+
+    const {type, payload} = action;
+
+
+    switch (type) {
+
+        case CART_ACTION_TYPES.SET_CART_ITEMS:
+        return {
+            ...state,
+            ...payload
+        }      
+
+        case CART_ACTION_TYPES.SET_IS_CART_OPEN:
+        return {
+            ...state,
+            isCartOpen: payload
+        }      
+    
+        default:
+            throw new Error(`Unhandled type error with type ${type}`)
+    }
+
+}
+
 
 export const CartContext = createContext({
     isCartOpen: false,
@@ -55,36 +93,48 @@ export const CartContext = createContext({
 // quantity
 
 export const CartProvider = ({children}) => {
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [cartItems, setCartItems] = useState([]);
-    const [cartCount, setCartCount] = useState(0);
-    const [cartTotal, setCartTotal] = useState(0);
+    // const [isCartOpen, setIsCartOpen] = useState(false);
 
 
-    useEffect( () => {
+    const [state, dispatch] = useReducer(cartReducer,INITIAL_STATE);
+
+    console.log('My state is: ', state);
+
+    const {isCartOpen, cartItems, cartCount, cartTotal} = state;
+
+
+    const updateCartItemsReducer = (cartItems) => {
+
         const newCartCount = cartItems.reduce((total,cartItem) => total + cartItem.quantity, 0);
-        setCartCount(newCartCount);
-    },[cartItems]);
-
-    // one of best practices of useEffect, single responsibility.
-
-    useEffect( () => {
         const newCartTotal = cartItems.reduce((total,cartItem) => total + (cartItem.price * cartItem.quantity), 0);
-        setCartTotal(newCartTotal);
-    },[cartItems]);
 
+        const payload = {
+            cartItems: cartItems,
+            cartCount: newCartCount,
+            cartTotal: newCartTotal
+        };
 
+        dispatch(createAction(CART_ACTION_TYPES.SET_CART_ITEMS,payload));
+    }
+
+    const setIsCartOpen = (bool) => {
+        dispatch(createAction(CART_ACTION_TYPES.SET_IS_CART_OPEN, bool));
+        dispatch({type: CART_ACTION_TYPES.SET_IS_CART_OPEN, payload: bool});
+    }
 
     const addItemToCart = (productToAdd) => {
-        setCartItems(addCartItem(cartItems, productToAdd));
+        const newCartItems = addCartItem(cartItems, productToAdd);
+        updateCartItemsReducer(newCartItems);
     }
 
     const removeItemToCart = (product) => {
-        setCartItems(removeCartItem(cartItems, product));
+        const newCartItems = removeCartItem(cartItems, product);
+        updateCartItemsReducer(newCartItems);
     }
 
     const clearItemFromCart = (product) => {
-        setCartItems(clearCartItem(cartItems, product));
+        const newCartItems = clearCartItem(cartItems, product);
+        updateCartItemsReducer(newCartItems);
     }
 
 
