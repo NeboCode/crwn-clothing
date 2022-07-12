@@ -98,8 +98,6 @@ export const CartProvider = ({children}) => {
 
     const [state, dispatch] = useReducer(cartReducer,INITIAL_STATE);
 
-    console.log('My state is: ', state);
-
     const {isCartOpen, cartItems, cartCount, cartTotal} = state;
 
 
